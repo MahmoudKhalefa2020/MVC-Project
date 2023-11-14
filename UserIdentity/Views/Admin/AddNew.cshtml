@@ -1,0 +1,74 @@
+﻿@model AdminAddNewVM
+@{
+    ViewData["Title"] = "AddNew";
+}
+<div class=" m-auto w-50 shadow p-3 mb-5 bg-body-tertiary rounded">
+    <partial name="index" class="mt-5" />
+</div>
+
+
+
+<div class=" m-auto my-4 w-50 shadow p-3 mb-5 bg-body-tertiary rounded">
+    <h1 class="mt-5">AddNew</h1>
+    <form>
+        <div class="mb-3">
+            <partial name="_Stage" model="Model.Stage" />
+        </div>
+        <div class="mb-3">
+            <partial name="_Lvl" model="Model.LvlVM" />
+        </div>
+        <div class="mb-3">
+            <partial name="_Subject" model="Model.subVm" />
+        </div>
+    </form>
+</div>
+
+
+
+
+<div id="tstdv"></div>
+
+
+@section Scripts{
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        console.log("before awy ")
+
+        $(document).ready(function () {
+            console.log("before ")
+
+            $("#subStage").change(function () {
+                $("#subLvl").empty();
+                $("#subLvl").html("")
+                console.log("TST")
+                $.ajax({
+                    url: "/Admin/CureentStageLevel",
+                    data: { "Id": $("#subStage").val() },
+                    method: "POST",
+                    success: function (result) {
+                        console.log("From ajax")
+                        $("#subLvl").empty();
+                        $("#subLvl").html("")
+
+                        $('#mySelect')
+                            .find('option')
+                            .remove()
+                            .end()
+                            .append('<option value="whatever">text</option>')
+                            .val('whatever');
+
+                        for (let item of result) {
+                            console.log(item);
+                            $("#subLvl").append('<option value="' + item.id + '">' + item.name + '</option>');
+                        }
+                    },
+                    error: function () {
+                        console.log("FAILED")
+                    }
+                });
+            })
+        })
+    </script>
+}

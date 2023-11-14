@@ -1,0 +1,14 @@
+﻿@model Stage
+
+<form asp-action="CreateStage">
+    <div class="mb-3">
+
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+
+    </div>
+    <div class="col-12">
+        <input type="submit" class="btn btn-outline-success value="Add Stage" />
+    </div>
+</form>

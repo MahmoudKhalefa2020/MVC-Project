@@ -1,0 +1,23 @@
+﻿@using Center_ElGhalaba.Models;
+@model Pager
+<div class="container">
+    <ul class="pagination justify-content-center">
+        @if (Model.TotalPages > 0)
+        {
+            <li class="page-item">
+                <a class="page-link" onclick="GetLessons('pref')">Pref</a>
+            </li>
+
+            for (var pge = Model.StartPage; pge <= Model.TotalPages; pge++)
+            {
+
+                <li class="page-item ">
+                    <a class="page-link " onclick="GetLessons(this.innerHTML)">@pge</a>
+                </li>
+            }
+            <li class="page-item">
+                <a class="page-link" id="next" value="0" onclick="GetLessons('next')">Next</a>
+            </li>
+        }
+    </ul>
+</div>

@@ -1,0 +1,359 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Center_ElGhalaba.Constants
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ApplicationUser user = await UserManager.GetUserAsync(User);
+}
+
+@using Center_ElGhalaba.Models
+@model Center_ElGhalaba.Models.Teacher
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<section class="mt-5">
+    <div class="container-fluid h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-lg-10">
+                <div class="card">
+                    <div class="rounded-top text-white d-flex flex-row gradient-custom-2" style="height:200px;">
+                        <div class="ms-4 mt-5 d-flex mx-4 flex-column ">
+                            @if (Model.AppUser.Image != null)
+                            {
+                                <img class="img-fluid img-thumbnail mt-4 mb-2" style="width: 150px; z-index: 1" alt="profile" src="data:image/*;base64,@(Convert.ToBase64String(Model.AppUser.Image))" />
+                                <span id="onlineIndicator" style="width:20px !important; height:20px !important;border-radius:50% !important;border: 13px solid #e70303 !important; z-index: 8 !important; position:absolute !important; top: 66px; left: 18px;"></span>
+                            }
+                            else
+                            {
+                                <img src="~/assets/img/gallery/Blank.png"
+                                     alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
+                                     style="width: 150px; z-index: 1">
+                                <span id="onlineIndicator" style="width:20px !important; height:20px !important;border-radius:50% !important;border: 13px solid #e70303 !important; z-index: 8 !important; position:absolute !important; top: 66px; left: 18px;"></span>
+                            }
+                            
+                            @if (await UserManager.IsInRoleAsync(user, RolesConsts.Teacher.ToString()) && user.Id == Model.AppUserID)
+                            {
+                                <a class="btn hero-btn" asp-area="Identity" asp-page="/Account/Manage/Index">Edit profile</a>
+                            }
+                            else
+                            {
+                                @if (await UserManager.IsInRoleAsync(user, RolesConsts.Student.ToString()))
+                                {
+                                    <div class="d-flex">
+                                        <div id="data1" class="mx-2">not teacher</div>
+                                        <div id="data2">not teacher</div>
+                                    </div>
+                                    <script>
+                                        window.onload = function () {
+                                            Folow('@user.Id.ToString()', '@Model.AppUserID.ToString()')
+                                            Like('@user.Id.ToString()', '@Model.AppUserID.ToString()')
+                                        }
+                                    </script>
+                                }
+                            }
+                            
+                        </div>
+                        <div class="ms-3" style="margin-top: 130px;">
+                            <h5>@Model.AppUser.FirstName @Model.AppUser.LastName</h5>
+                            <p>Email: @Model.AppUser.Email</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 text-black" style="background-color: #f8f9fa;">
+                        <div class="d-flex justify-content-end text-center py-1">
+                            
+                            <div class="px-3">
+                                <p id="Likescount" class="mb-1 h5">@Model.Likes.Count</p>
+                                <p class="small text-muted mb-0">Likes</p>
+                            </div>
+                            <div>
+                                <p id="Followerscount" class="mb-1 h5">@Model.Follows.Count</p>
+                                <p class="small text-muted mb-0">Followers</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4 text-black">
+                        <div class="mb-5">
+                            <p class="lead fw-normal mb-1">About</p>
+                            <div class="p-4" style="background-color: #f8f9fa;">
+                                @if (await UserManager.IsInRoleAsync(user, RolesConsts.Teacher.ToString()) && user.Id == Model.AppUserID)
+                                {
+                                    <p class="font-italic mb-1">Balance: @Model.Balance 
+                                        <b><a asp-action="Teacher" asp-controller="Payment" asp-route-Id="@Model.ID" class="text-info ml-2">Withdrow</a></b>
+                                    </p>
+                                }
+                                <p class="font-italic mb-1">Adress: @Model.AppUser.Address</p>
+                                @if (Model.AppUser.PhoneNumber != null)
+                                {
+                                    <p class="font-italic mb-1">PhoneNumber: @Model.AppUser.PhoneNumber</p>
+                                }
+                                <p class="font-italic mb-1">Birthdate: @Model.AppUser.Birthdate.ToShortDateString()</p>
+                            </div>
+                        </div>
+
+                        <div class="courses-area fix">
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-xl-7 col-lg-8">
+                                        @if (await UserManager.IsInRoleAsync(user, RolesConsts.Teacher.ToString()) && user.Id == Model.AppUserID)
+                                        {
+                                            <div class="section-tittle text-center mb-55 d-flex justify-content-between">
+                                                <h2>Your Lessons</h2>
+                                                <h2><a asp-action="New" asp-controller="Lesson" asp-route-Id="@Model.ID" class="text-info ml-2">Add New</a></h2>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="section-tittle text-center mb-55">
+                                                <h2>Lessons</h2>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="courses-actives">
+
+                                    @if (Model.Lessons.Count > 0)
+                                    {
+
+                                        @foreach (Lesson lesson in Model.Lessons)
+                                        {
+                                            <div class="properties pb-20">
+                                                <div class="properties__card">
+                                                    <div class="properties__img overlay1">
+                                                        <img src="data:image/*;base64,@(Convert.ToBase64String(lesson.CoverPicture))" alt="">
+                                                    </div>
+
+                                                    <div class="properties__caption">
+                                                        <h3 class="card-title">Title : @lesson.Title </h3>
+                                                        <p class="card-title">PublishDate: @lesson.PublishDate</p>
+                                                        <p class="card-title">Likes: @lesson.Likes</p>
+                                                        <p class="card-text">@lesson.Description</p>
+                                                        <p class="card-text">Views: @lesson.Views</p>
+                                                        <p class="card-text">Discount: @lesson.Discount</p>
+                                                        <div class="properties__footer d-flex justify-content-between align-items-center">
+                                                            <div class="price py-2">
+                                                                <span>Price: @lesson.Price EG</span>
+                                                            </div>
+                                                        </div>
+
+                                                        @if (await UserManager.IsInRoleAsync(user, RolesConsts.Teacher.ToString()) && user.Id == Model.AppUserID)
+                                                        {
+                                                            <a asp-action="Edit" asp-controller="Lesson" asp-route-id="@lesson.ID" class="text-info">Edit</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="/Payment/Student?AppUserID=@user.Id&Id=@lesson.ID" class="text-info">By Now</a>
+                                                        }
+
+                                                        @if (! ( await UserManager.IsInRoleAsync(user, RolesConsts.Teacher.ToString()) && user.Id == Model.AppUserID))
+                                                        {
+                                                            <a asp-action="SubjectLessons" asp-route-id="@lesson.subjectID" asp-controller="Lesson" class="mt-4 border-btn border-btn2">Find out more category</a>
+                                                        }
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>Dont Have Any Courses Yet  
+                                        @if( await UserManager.IsInRoleAsync(user, RolesConsts.Teacher.ToString()) && user.Id == Model.AppUserID)
+                                        {
+                                            <span>Do You Want To</span>
+                                            <a asp-action="New" asp-controller="Lesson" asp-route-id="@Model.ID" style="color:#FF9F67">Create One</a>
+                                        }
+                                        </div>
+                                    }
+                                    <!-- Single -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+@section Scripts{
+
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    
+    <script>
+        //define Hub
+        var hub = new signalR.HubConnectionBuilder().withUrl("/TeacherHub").build();
+
+        //start connect
+        hub.start().then(function () {
+            console.log("Connect Success");
+        });
+
+        ////lesten To The Server If There Is Follow Removed
+        hub.on("RemoveFollower", function (teacherId) {
+            if(teacherId == "@Model.AppUserID.ToString()"){
+                var follows = $("#Followerscount").html();
+                $("#Followerscount").html((parseInt(follows) - 1));
+            }
+        });
+
+        ////lesten To The Server If There Is Follow Added
+        hub.on("AddFollower", function (teacherId) {
+            if (teacherId == "@Model.AppUserID.ToString()") {
+                let beat = new Audio('/assets/Sounds/Notify.mp3');
+                beat.play();
+
+                var follows = $("#Followerscount").html();
+                $("#Followerscount").html((parseInt(follows) + 1));
+            }
+        });
+        
+        ////lesten To The Server If There Is Like Removed
+        hub.on("RemoveLike", function (teacherId) {
+            if (teacherId == "@Model.AppUserID.ToString()") {
+                var follows = $("#Likescount").html();
+                $("#Likescount").html((parseInt(follows) - 1));
+            }
+        });
+
+        ////lesten To The Server If There Is Like Added
+        hub.on("AddLike", function (teacherId) {
+            if (teacherId == "@Model.AppUserID.ToString()") {
+                let beat = new Audio('/assets/Sounds/Notify.mp3');
+                beat.play();
+
+                var follows = $("#Likescount").html();
+                $("#Likescount").html((parseInt(follows) + 1));
+            }
+        });
+
+        //////UserLoggedHub/////
+        var newUserHub = new signalR.HubConnectionBuilder().withUrl("/UserHub").build();
+
+        newUserHub.start().then(function () {
+            console.log("UserHub Connected Successfully");
+        });
+
+        newUserHub.on("UserLoggedIn", function (userId) {
+            if (userId == "@Model.AppUserID.ToString()") {
+                $("#onlineIndicator").css("border-color", "green");
+            }
+        });
+
+        newUserHub.on("UserLoggedOut", function (userId) {
+            if (userId == "@Model.AppUserID.ToString()") {
+                $("#onlineIndicator").css("border-color", "Red");
+            }
+        });
+
+        /////
+
+        function Add(s, t) {
+            $.ajax({
+                url: '/Teachers/AddFollower',
+                data: { studentId: s, teacherId: t },
+                success: function (result) {
+                    $("#data1").html("<a class='btn' onclick=Remove('" + s + "','" + t + "')>UnFollow</a>")
+
+                    var follows = $("#Followerscount").html();
+                    $("#Followerscount").html((parseInt(follows) + 1));
+
+                },
+                error: function (xhr, status) {
+                    alert("Add error " + status);
+                }
+            });
+        };
+        function Remove(s, t) {
+            $.ajax({
+                url: '/Teachers/RemoveFollower',
+                data: { studentId: s, teacherId: t },
+                success: function (result) {
+                    $("#data1").html("<a class='btn' onclick=Add('" + s + "','" + t + "')>Follow</a>")
+
+                    var follows = $("#Followerscount").html();
+                    $("#Followerscount").html((parseInt(follows) - 1));
+
+                },
+                error: function (xhr, status) {
+                    alert("Remove error " + status);
+                }
+            });
+        };
+        function Folow(s, t) {
+            $.ajax({
+                url: '/Teachers/IsFolowwing',
+                data: { studentId: s, teacherId: t },
+                success: function (result) {
+                    if (result) {
+                        $("#data1").html("<a id='Followbtn' class='btn' onclick=Remove('" + s + "','" + t + "')>UnFollow</a>")
+                    }
+                    else {
+                        $("#data1").html("<a id='Followbtn' class='btn' onclick=Add('" + s + "','" + t + "')>Follow</a>")
+                    }
+                },
+                error: function (xhr, status) {
+                    alert("Follow error " + status);
+                }
+            });
+        };
+
+
+        function AddLike(s, t) {
+            $.ajax({
+                url: '/Teachers/AddLike',
+                data: { studentId: s, teacherId: t },
+                success: function (result) {
+                    $("#data2").html("<a class='btn' onclick=RemoveLike('" + s + "','" + t + "')>UnLike</a>")
+
+                    var follows = $("#Likescount").html();
+                    $("#Likescount").html((parseInt(follows) + 1));
+
+                },
+                error: function (xhr, status) {
+                    alert("Add error " + status);
+                }
+            });
+        };
+        function RemoveLike(s, t) {
+            $.ajax({
+                url: '/Teachers/RemoveLike',
+                data: { studentId: s, teacherId: t },
+                success: function (result) {
+                    $("#data2").html("<a class='btn' onclick=AddLike('" + s + "','" + t + "')>Like</a>")
+
+                    var follows = $("#Likescount").html();
+                    $("#Likescount").html((parseInt(follows) - 1));
+
+                },
+                error: function (xhr, status) {
+                    alert("Remove error " + status);
+                }
+            });
+        };
+
+        function Like(s, t) {
+            $.ajax({
+                url: '/Teachers/IsLike',
+                data: { studentId: s, teacherId: t },
+                success: function (result) {
+                    if (result) {
+                        $("#data2").html("<a id='Likbtn' class='btn' onclick=RemoveLike('" + s + "','" + t + "')>UnLike</a>")
+                    }
+                    else {
+                        $("#data2").html("<a id='Likbtn' class='btn' onclick=AddLike('" + s + "','" + t + "')>Like</a>")
+                    }
+                },
+                error: function (xhr, status) {
+                    alert("Like error " + status);
+                }
+            });
+        };
+    </script>
+
+}

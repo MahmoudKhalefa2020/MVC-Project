@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="container">
+    
+    <div class="text-center">
+        <h1 class="mt-5 ml-3">Admin panel</h1>
+    </div>
+    <div class="row align-items-center justify-content-center">
+    <div class="btn-group p-3 ">
+    <a asp-action="Students" class="btn">Students</a>
+    <a asp-action="Teachers" class="btn">Teachers</a>
+    <a asp-action="Lessons" class="btn">Lessons</a>
+    <a asp-action="Comments" class="btn">Comments</a>
+   </div>
+    <div class="btn-group p-3">
+    <a asp-action="DeletedStudents" class="btn">Deleted Students</a>
+    <a asp-action="DeletedTeachers" class="btn">Deleted Teachers</a>
+        <a asp-action="DeletedLessons" class="btn">Deleted Lessons</a>
+        <a asp-action="AddNew" class="btn">Add New</a>
+    </div>
+    </div>
+    
+</div>
+

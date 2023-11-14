@@ -1,0 +1,54 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Center_ElGhalaba.Constants
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ApplicationUser user = await UserManager.GetUserAsync(User);
+}
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    if (user.Image != null)
+    {
+        <li class="nav-item">
+                <img class="rounded-circle" id="_Avatar" src="data:image/*;base64,@(Convert.ToBase64String(user.Image))" alt="Profile Picture" />
+        </li>
+    }
+
+    if (await UserManager.IsInRoleAsync(user, RolesConsts.Admin.ToString()))
+    {
+        <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index" title="Manage">Hello @user.FirstName!</a>
+        </li>
+    }
+    else if (await UserManager.IsInRoleAsync(user, RolesConsts.Student.ToString()))
+    {
+        <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Student" asp-action="Details" asp-route-Id="@user.Id" title="Manage">Hello @user.FirstName!</a>
+        </li>
+    }
+    else if (await UserManager.IsInRoleAsync(user, RolesConsts.Teacher.ToString()))
+    {
+        <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Teachers" asp-action="Details" asp-route-Id="@user.Id" title="Manage">Hello @user.FirstName!</a>
+        </li>
+    }
+
+    <li class="nav-item">
+        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+        </form>
+    </li>
+
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </li>
+}
+</ul>
